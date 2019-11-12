@@ -65,3 +65,40 @@ export const reqAddProduct = ({categoryId,name,price,desc,detail}) => ajax({
     detail
   }
 })
+
+//更新商品信息数据的接口
+export const reqUpdateProduct = ({productId,categoryId,name,price,desc,detail}) => ajax({
+  method: 'POST',
+  url: '/product/update',
+  data: {
+    productId,
+    categoryId,
+    name,
+    price,
+    desc,
+    detail
+  }
+})
+
+//删除商品信息数据的接口
+export const reqDeleteProduct = (productId)=>ajax({
+  method: 'POST',
+  url: '/product/delete',
+  data: {
+    productId
+  }
+})
+
+//搜索商品信息数据的忌口
+export const reqSearchProduct = ({searchKey,searchValue,pageNum,pageSize})=>ajax({
+  method: 'GET',
+  url: '/product/search',
+  params: {
+    [searchKey]:searchValue,
+    pageNum,
+    pageSize
+  }
+})
+
+//获取角色的信息数据的接口
+export const reqGetRoles=()=>ajax('/role/get')

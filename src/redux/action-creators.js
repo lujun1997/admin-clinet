@@ -1,8 +1,8 @@
 // 包含了多个同步及异步的action的creator---包含了多个生产action对象的工厂函数
 // 引入action的type
-import { SAVE_USER, REMOVE_USER, UPDATE_TITLE, GET_CATEGORIES, ADD_CATEGORY, UPDATE_CATEGORY, DEL_CATEGORY } from './action-types.js'
+import { SAVE_USER, REMOVE_USER, UPDATE_TITLE, GET_CATEGORIES, ADD_CATEGORY, UPDATE_CATEGORY, DEL_CATEGORY,GET_ROLES } from './action-types.js'
 // 引入接口文件
-import { reqCategories, reqAddCategory, reqUpdateCategory, reqDeleteCategory } from '../api/index.js'
+import { reqCategories, reqAddCategory, reqUpdateCategory, reqDeleteCategory,reqGetRoles } from '../api/index.js'
 // 保存用户信息(的同时也要保存token)
 export const saveUser = (value) => ({ type: SAVE_USER, data: value })
 // 删除用户信息(的同时也要删除token)
@@ -61,6 +61,19 @@ export const delCategory = (categoryId) => {
     const result = await reqDeleteCategory(categoryId)
     if (result.status === 0) {
       dispatch(delCategorySuccess(result.data))
+    }
+  }
+}
+// 获取角色信息数据的同步action
+const getRolesSuccess=(roles)=>({type:GET_ROLES,data:roles})
+// 获取角色信息数据的异步action
+export const getRoles=()=>{
+  return async (dispatch)=>{
+    // 发送异步请求
+    const result=await reqGetRoles()
+    if(result.status===0){
+      // 分发同步action
+      dispatch(getRolesSuccess(result.data))
     }
   }
 }

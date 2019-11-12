@@ -6,6 +6,10 @@ import Category from '../containers/Category/Category'
 import Product from '../containers/product/Product.jsx'
 // 引入添加或者修改商品的组件
 import AddUpdate from '../containers/product/add-update/AddUpdate.jsx'
+// 引入Role组件
+import Role from '../containers/role/Role.jsx'
+// 引入User组件
+import User from '../containers/user/User.jsx'
 export default[
   {
     exact:true,
@@ -26,5 +30,14 @@ export default[
     exact:true,
     path:'/product/addupdate',
     component:AddUpdate
+  },
+  {
+    exact:true,
+    path:'/role',
+    component:Role
+  },{
+    exact:true,
+    path:'/user',
+    component:User
   }
 ]

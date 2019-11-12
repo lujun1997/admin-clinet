@@ -52,7 +52,7 @@ class HeaderMain extends Component {
   // 界面渲染完毕的生命周期函数
   componentDidMount() {
     screenfull.on('change', this.screenChange);
-    setInterval(()=>{
+    this.timer=setInterval(()=>{
       this.setState({
         time:dayjs().format('YYYY-MM-DD hh:mm:ss')
       })
@@ -60,6 +60,7 @@ class HeaderMain extends Component {
   }
   // 组件卸载的生命周期函数
   componentWillUnmount() {
+    clearInterval(this.timer)
     screenfull.off('change', this.screenChange);
   }
   // 国际化
