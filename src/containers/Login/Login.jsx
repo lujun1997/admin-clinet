@@ -39,7 +39,6 @@ class Login extends Component {
           message.success('登录成功')
           this.props.saveUser(result.data)
           // 跳转到首页
-          console.log(this.props)
           this.props.history.replace('/')
         } else {
           message.error(result.msg)

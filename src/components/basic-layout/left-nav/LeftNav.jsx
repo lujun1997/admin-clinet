@@ -13,7 +13,7 @@ import { updateTitle } from '../../../redux/action-creators.js'
 const { SubMenu } = Menu;
 
 // 装饰器
-@connect(null, { updateTitle })
+@connect(state=>({menus:state.user.user.menus}), { updateTitle })
 @withTranslation()
 @withRouter
 class LeftNav extends Component {
@@ -29,7 +29,7 @@ class LeftNav extends Component {
     )
   }
   // 创建菜单的
-  createMenus = () => {
+  createMenus = (menus) => {
     return menus.map(menu => {
       // 有没有二级的菜单
       if (menu.children) {
@@ -81,6 +81,7 @@ class LeftNav extends Component {
   }
   // 方法----根据路径找对应title
   findTitleByKey = (pathname) => {
+    const menus = this.checkMenu()
     // menus中找
     for (let i = 0; i < menus.length; i++) {
       const menu = menus[i]
@@ -100,6 +101,7 @@ class LeftNav extends Component {
         }
       }
     }
+    return '404'
   }
   componentDidMount() {
     // 获取路径
@@ -114,8 +116,6 @@ class LeftNav extends Component {
   }
   // 选中的时候更新对应的title
   selectItem = ({ key }) => {
-    //console.log(xxx)
-    //console.log(xxx)
     //key: "/user" 是一个路径 ----xxx是一个对象----item----node----innerText---获取到标题信息
     // 获取到当前选中的标题信息(中文内容)----而是整个选项的menus.title---'键'
     // t(menus.product)----进行翻译了
@@ -125,10 +125,33 @@ class LeftNav extends Component {
     // 更新操作---redux---action-creators中的updateTitle---action对象---->reducers---store
     this.props.updateTitle(title)
   }
-
+  checkMenu=()=>{
+    return menus.reduce((prev,current)=>{
+      //最终返回的是一个新的数组,将原菜单中的key中的地址和redux中的menus中的地址进行比较,显示响应权限应该展示的页面
+      //this.props.menus:['/','/products','/category','/product','/user',...'/charts/pie'] 
+      //current:{icon:'home',title:'menus.home',key:'/'}
+      //includes是判断数组中是否包含某一个指定的值,如果包括,则返回true
+      if(this.props.menus.includes(current.key)){
+        prev.push(current)
+      }else if(current.children){
+        //如果一级菜单中没有对应的路径,判断是否是个带二级菜单的一级菜单
+        //children是一个数组,里面是一个个对象,对每一项进行筛选,返回一个新的数组
+        const cMenus = current.children.filter((menu)=>{
+          //判断children中的路径是否被包含在redux的menus中
+          return this.props.menus.includes(menu.key)
+        })
+        if(cMenus.length){
+          //将当前项展开,替换其中的children属性
+          prev.push({...current,children:cMenus})
+        }
+      }
+      return prev
+    },[])
+  }
   render() {
     // 调用方法显示菜单
-    const menus = this.createMenus()
+    const newMenus = this.checkMenu()
+    const menus = this.createMenus(newMenus)
     // 获取当前组件的相对应的路径,如果要使用location对象,当前的组件要么有location属性,要么当前的组件应该是一个路由组件
     let { pathname } = this.props.location
     pathname = pathname.startsWith('/product') ? '/product' : pathname

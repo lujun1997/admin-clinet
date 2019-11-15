@@ -1,21 +1,30 @@
 import React, { Component } from 'react';
 import { Form, Input, Select } from 'antd';
-
+import {connect} from 'react-redux'
+import PropTypes from 'prop-types'
 const Item = Form.Item;
 const Option = Select.Option;
-
+@connect(state=>({roles:state.roles}),null)
 @Form.create()
 class AddUserForm extends Component {
-
+  static propTypes={
+    setAdd:PropTypes.func.isRequired
+  }
+  constructor(props) {
+    super(props)
+    this.props.setAdd(this.props.form)
+  }
   render () {
     const { getFieldDecorator } = this.props.form;
-    
     return (
       <Form>
         <Item label='用户名' labelCol={{span: 6}}  wrapperCol={{span: 15}}>
           {
             getFieldDecorator(
-              'name'
+              'username',
+              {
+                rules: [{ required: true, message: '请输入用户名' }],
+              }
             )(
               <Input placeholder='请输入用户名'/>
             )
@@ -24,7 +33,10 @@ class AddUserForm extends Component {
         <Item label='密码' labelCol={{span: 6}}  wrapperCol={{span: 15}}>
           {
             getFieldDecorator(
-              'password'
+              'password',
+              {
+                rules: [{ required: true, message: '请输入密码' }],
+              }
             )(
               <Input placeholder='请输入密码' type='password'/>
             )
@@ -33,7 +45,10 @@ class AddUserForm extends Component {
         <Item label='手机号' labelCol={{span: 6}}  wrapperCol={{span: 15}}>
           {
             getFieldDecorator(
-              'phone'
+              'phone',
+              {
+                rules: [{ required: true, message: '请输入手机号' }],
+              }
             )(
               <Input placeholder='请输入手机号'/>
             )
@@ -42,7 +57,10 @@ class AddUserForm extends Component {
         <Item label='邮箱' labelCol={{span: 6}}  wrapperCol={{span: 15}}>
           {
             getFieldDecorator(
-              'email'
+              'email',
+              {
+                rules: [{ required: true, message: '请输入邮箱' }],
+              }
             )(
               <Input placeholder='请输入邮箱'/>
             )
@@ -51,11 +69,15 @@ class AddUserForm extends Component {
         <Item label='角色' labelCol={{span: 6}}  wrapperCol={{span: 15}}>
           {
             getFieldDecorator(
-              'roleId'
+              'roleId',
+              {
+                rules: [{ required: true, message: '请选择分类' }],
+              }
             )(
               <Select placeholder='请选择分类'>
-                <Option value='1'>1</Option>
-                <Option value='2'>2</Option>
+                {
+                  this.props.roles.map(role=><Option key={role._id} value={role._id}>{role.name}</Option>)
+                }
               </Select>
             )
           }

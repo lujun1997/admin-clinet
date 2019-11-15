@@ -1,8 +1,14 @@
 // 包含了多个同步及异步的action的creator---包含了多个生产action对象的工厂函数
 // 引入action的type
-import { SAVE_USER, REMOVE_USER, UPDATE_TITLE, GET_CATEGORIES, ADD_CATEGORY, UPDATE_CATEGORY, DEL_CATEGORY,GET_ROLES } from './action-types.js'
+import { SAVE_USER, REMOVE_USER, UPDATE_TITLE, GET_CATEGORIES, ADD_CATEGORY, UPDATE_CATEGORY, DEL_CATEGORY,
+  GET_ROLES,ADD_ROLES,UPDATE_ROLES,DELETE_ROLES,
+  GET_USERS,ADD_USER,UPDATE_USER,DELETE_USER,
+} from './action-types.js'
 // 引入接口文件
-import { reqCategories, reqAddCategory, reqUpdateCategory, reqDeleteCategory,reqGetRoles } from '../api/index.js'
+import { reqCategories, reqAddCategory, reqUpdateCategory, reqDeleteCategory,reqGetRoles,
+  reqAddRoles,reqUpdateRoles,reqDeleteRoles,
+  reqGetUsers,reqUpdateUser,reqDeleteUser,reqAddUser
+} from '../api/index.js'
 // 保存用户信息(的同时也要保存token)
 export const saveUser = (value) => ({ type: SAVE_USER, data: value })
 // 删除用户信息(的同时也要删除token)
@@ -74,6 +80,103 @@ export const getRoles=()=>{
     if(result.status===0){
       // 分发同步action
       dispatch(getRolesSuccess(result.data))
+    }
+  }
+}
+
+// 添加角色信息数据的同步action
+const addRolesSuccess=(role)=>({type:ADD_ROLES,data:role})
+// 添加角色信息数据的异步action
+export const addRole=(name)=>{
+  return async (dispatch)=>{
+    // 发送异步请求
+    const result=await reqAddRoles(name)
+    if(result.status===0){
+      // 分发同步action
+      dispatch(addRolesSuccess(result.data))
+    }
+  }
+}
+
+// 修改角色信息数据的同步action
+const updateRolesSuccess=(role)=>({type:UPDATE_ROLES,data:role})
+// 修改角色信息数据的异步action
+export const updateRoles=(roleId,authName,menus)=>{
+  return async (dispatch)=>{
+    // 发送异步请求
+    const result=await reqUpdateRoles(roleId,authName,menus)
+    if(result.status===0){
+      // 分发同步action
+      dispatch(updateRolesSuccess(result.data))
+    }
+  }
+}
+
+// 删除角色信息数据的同步action
+const deleteRolesSuccess=(roleId)=>({type:DELETE_ROLES,data:roleId})
+// 删除角色信息数据的异步action
+export const deleteRoles=(roleId)=>{
+  return async (dispatch)=>{
+    // 发送异步请求
+    const result=await reqDeleteRoles(roleId)
+    if(result.status===0){
+      // 分发同步action
+      dispatch(deleteRolesSuccess(roleId))
+    }
+  }
+}
+
+// 获取用户信息数据的同步action
+const getUsersSuccess=(users)=>({type:GET_USERS,data:users})
+// 获取角色信息数据的异步action
+export const getUsers=()=>{
+  return async (dispatch)=>{
+    // 发送异步请求
+    const result=await reqGetUsers()
+    if(result.status===0){
+      // 分发同步action
+      dispatch(getUsersSuccess(result.data))
+    }
+  }
+}
+// 更新用户信息数据的同步action对象
+const updateUserSuccess=()=>({type:UPDATE_USER})
+// 更新角色信息数据的异步action函数
+export const updateUser=(username,password)=>{
+  return async (dispatch)=>{
+    // 发送异步请求
+    const result=await reqUpdateUser(username,password)
+    if(result.status===0){
+
+      // 分发同步action
+      dispatch(updateUserSuccess())
+    }
+  }
+}
+
+// 添加用户信息数据的同步action对象
+const addUserSuccess=(user)=>({type:ADD_USER,data:user})
+// 添加角色信息数据的异步action函数
+export const addUser=({username,password,phone,email,roleId})=>{
+  return async (dispatch)=>{
+    // 发送异步请求
+    const result=await reqAddUser({username,password,phone,email,roleId})
+    if(result.status===0){
+      // 分发同步action
+      dispatch(addUserSuccess(result.data))
+    }
+  }
+}
+
+
+// 删除用户信息数据的同步action
+const deleteUserSuccess = (username) => ({ type: DELETE_USER, data: username })
+// 删除用户信息数据的异步action
+export const deleteUser = (username) => {
+  return async (dispatch) => {
+    const result = await reqDeleteUser(username)
+    if (result.status === 0) {
+      dispatch(deleteUserSuccess(username))
     }
   }
 }

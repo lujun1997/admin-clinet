@@ -1,100 +1,88 @@
 import React, { Component } from 'react';
+import menes from '../../config/menus'
+import {withTranslation} from 'react-i18next'
+import PubSub from 'pubsub-js'
 import { Form, Input, Tree } from 'antd';
 import PropTypes from 'prop-types'
 const Item = Form.Item;
 const { TreeNode } = Tree;
-
-const treeData = [
-  {
-  title: '0-0',
-  key: '0-0',
-  children: [{
-    title: '0-0-0',
-    key: '0-0-0',
-    children: [
-      { title: '0-0-0-0', key: '0-0-0-0' },
-      { title: '0-0-0-1', key: '0-0-0-1' },
-      { title: '0-0-0-2', key: '0-0-0-2' },
-    ],
-  }, {
-    title: '0-0-1',
-    key: '0-0-1',
-    children: [
-      { title: '0-0-1-0', key: '0-0-1-0' },
-      { title: '0-0-1-1', key: '0-0-1-1' },
-      { title: '0-0-1-2', key: '0-0-1-2' },
-    ],
-  }, {
-    title: '0-0-2',
-    key: '0-0-2',
-  }],
-}, {
-  title: '0-1',
-  key: '0-1',
-  children: [
-    { title: '0-1-0-0', key: '0-1-0-0' },
-    { title: '0-1-0-1', key: '0-1-0-1' },
-    { title: '0-1-0-2', key: '0-1-0-2' },
-  ],
-}, {
-  title: '0-2',
-  key: '0-2',
-}
-];
-
+@withTranslation()
 @Form.create()
 class UpdateRoleForm extends Component {
   constructor(props){
     super(props)
+    //把当前组件的form传给父级
     this.props.setUpdateForm(this.props.form)
   }
   static propTypes={
-    setUpdateForm:PropTypes.func.isRequired
+    setUpdateForm:PropTypes.func.isRequired,
+    role:PropTypes.object.isRequired
   }
   state = {
-    expandedKeys: [],
-    autoExpandParent: true,
-    checkedKeys: [],
-    selectedKeys: [],
+    checkedKeys: []
   };
+  //设置节点树中显示的数据
+  getTreeNodes=()=>{
+    const treeDate = menes.map((menu)=>{
+      if(menu.children){
+        return {
+          title: menu.title,
+          key: menu.key,
+          children:menu.children.map((cMenu)=>{
+            return {
+              title: cMenu.title,
+              key: cMenu.key
+            }
+          })
+        }
+      }else{
+        return {
+          title: menu.title,
+          key: menu.key
+        }
+      }
+    })
+    return [
+      {
+        title:'平台权限',
+        key:'/power',
+        children:treeDate
+      }
+    ]
+  }
   
 
-  onExpand = (expandedKeys) => {
-    console.log('onExpand', expandedKeys);
-    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
-    // or, you can remove all expanded children keys.
-    this.setState({
-      expandedKeys,
-      autoExpandParent: false,
+
+  
+  onCheck = (checkedKeys) => {
+    // 更新状态数据
+    this.setState({ checkedKeys },()=>{
+      // 缓存
+      PubSub.publish('getCheckedKeys',checkedKeys );
+      // 可以清空state中的checkedKeys的数据
+      this.state.checkedKeys=[]
     });
   };
   
-  onCheck = (checkedKeys) => {
-    console.log('onCheck', checkedKeys);
-    this.setState({ checkedKeys });
-  };
-  
-  onSelect = (selectedKeys, info) => {
-    console.log('onSelect', info);
-    this.setState({ selectedKeys });
-  };
   
   renderTreeNodes = data => data.map((item) => {
+    const { t } = this.props
     if (item.children) {
       return (
-        <TreeNode title={item.title} key={item.key} dataRef={item}>
+        <TreeNode title={t(item.title)} key={item.key} dataRef={item}>
           {
             this.renderTreeNodes(item.children)
           }
         </TreeNode>
       );
     }
-    return <TreeNode {...item} />;
+    return <TreeNode  title={t(item.title)} key={item.key}/>;
   });
   
   render () {
     const { getFieldDecorator } = this.props.form;
-    this.props.setUpdateForm(this.props.form)
+    const {name,menus} = this.props.role
+    const { checkedKeys } = this.state
     return (
       <Form>
         <Item label='角色名称'>
@@ -102,7 +90,7 @@ class UpdateRoleForm extends Component {
             getFieldDecorator(
               'name',
               {
-                initialValue: ''
+                initialValue: name||''
               }
             )(
               <Input placeholder='请输入角色名称' disabled/>
@@ -112,15 +100,11 @@ class UpdateRoleForm extends Component {
         <Item>
           <Tree
             checkable
-            onExpand={this.onExpand}
-            expandedKeys={this.state.expandedKeys}
-            autoExpandParent={this.state.autoExpandParent}
+            defaultExpandAll
             onCheck={this.onCheck}
-            checkedKeys={this.state.checkedKeys}
-            onSelect={this.onSelect}
-            selectedKeys={this.state.selectedKeys}
+            checkedKeys={checkedKeys.length?checkedKeys:menus}
           >
-            {this.renderTreeNodes(treeData)}
+            {this.renderTreeNodes(this.getTreeNodes())}
           </Tree>
         </Item>
       </Form>
